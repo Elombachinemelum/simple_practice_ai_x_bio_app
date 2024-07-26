@@ -18,9 +18,10 @@ const config = {
         "2xl": "1400px",
       },
     },
-    screens: {
-      mini: "450px",
-    },
+    // removing custom breakpoint beacuse Next can't fucking handle this for now
+    // screens: {
+    //   mini: "450px",
+    // },
     extend: {
       fontFamily: {
         sans: ["var(--font-geist-sans)"],
