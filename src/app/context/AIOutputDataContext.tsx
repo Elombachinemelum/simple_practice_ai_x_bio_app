@@ -13,14 +13,6 @@ interface BioInfo {
   bio: string;
 }
 
-const test = {
-  responseData: [
-    {
-      bio: "God is good, This I have found to be good always. 😊",
-    },
-  ],
-};
-
 interface OutputData {
   output: BioInfo[];
   loadingData: boolean;
