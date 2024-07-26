@@ -1,5 +1,6 @@
 import { Sansita } from "next/font/google";
 import type { Config } from "tailwindcss";
+import defaultTheme from "tailwindcss/defaultTheme";
 
 const config = {
   darkMode: ["class"],
@@ -18,10 +19,11 @@ const config = {
         "2xl": "1400px",
       },
     },
-    // removing custom breakpoint beacuse Next can't fucking handle this for now
-    // screens: {
-    //   mini: "450px",
-    // },
+    // adding this property here will completely override all the available break points so we have to redeclare all the break points
+    screens: {
+      mini: "450px",
+      ...defaultTheme.screens,
+    },
     extend: {
       fontFamily: {
         sans: ["var(--font-geist-sans)"],
