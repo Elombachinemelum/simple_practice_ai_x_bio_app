@@ -18,6 +18,9 @@ const config = {
         "2xl": "1400px",
       },
     },
+    screens: {
+      mini: "450px",
+    },
     extend: {
       fontFamily: {
         sans: ["var(--font-geist-sans)"],

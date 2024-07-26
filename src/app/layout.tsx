@@ -7,6 +7,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import GridPattern from "@/components/magicui/grid-pattern";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AIOutputProvider } from "./context/AIOutputDataContext";
 
 // const inter = Inter({ subsets: ["latin"] });
 
@@ -24,8 +25,10 @@ export default function RootLayout({
     <html lang="en" dir="ltr">
       <body className={cn(GeistSans.variable, "font-sans")}>
         <TooltipProvider>
-          <GridPattern width={60} height={60} className="-z-10 opacity-40" />
-          {children}
+          <AIOutputProvider>
+            <GridPattern width={60} height={60} className="-z-10 opacity-40" />
+            {children}
+          </AIOutputProvider>
         </TooltipProvider>
       </body>
     </html>

@@ -26,9 +26,11 @@ import {
 import { ReactNode } from "react";
 import { MetaIcon, MistralIcon } from "../icons";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { Info } from "lucide-react";
+import { Info, Loader2 } from "lucide-react";
 import { Textarea } from "../ui/textarea";
 import { Switch } from "../ui/switch";
+import { generateBio } from "@/app/serverActions/actions";
+import { useAIContext } from "@/app/context/AIOutputDataContext";
 
 const tones = [
   "Professional",
@@ -55,7 +57,6 @@ const formSchema = z.object({
     }),
   type: z.enum(["personal", "brand"], {
     errorMap: (g) => {
-      console.log(g, "from enum callback");
       return { message: "value entered is not acceptable" };
     },
   }),
@@ -71,6 +72,7 @@ const formSchema = z.object({
 });
 
 const UserInput = () => {
+  const { loadingData, setOutput, setLoadingData } = useAIContext();
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -85,10 +87,32 @@ const UserInput = () => {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setLoadingData(true);
+    // clear previous data
+    setOutput([]);
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log(values);
+    const inputs = `
+    User Input: ${values.content},
+    Bio Tone: ${values.tone},
+    Bio Type: ${values.type},
+    Add Emojis: ${values.emojis}
+    `;
+    try {
+      const response = await generateBio(
+        inputs,
+        values.temperature,
+        values.model
+      );
+      if (response.responseData?.length) {
+        setOutput(response.responseData);
+      }
+      setLoadingData(false);
+    } catch (error) {
+      console.error(error);
+      setLoadingData(false);
+    }
   }
 
   interface ModelItem {
@@ -133,7 +157,6 @@ const UserInput = () => {
                 control={form.control}
                 name="model"
                 render={({ field }) => {
-                  console.log({ field }, "from select");
                   return (
                     <FormItem>
                       <FormLabel>Model</FormLabel>
@@ -203,7 +226,6 @@ const UserInput = () => {
                     <FormControl>
                       <Slider
                         onValueChange={(valuePercent) => {
-                          console.log({ valuePercent });
                           field.onChange(valuePercent?.[0]);
                         }}
                         defaultValue={[field.value]}
@@ -229,7 +251,6 @@ const UserInput = () => {
                 control={form.control}
                 name="content"
                 render={({ field }) => {
-                  console.log(field.value);
                   return (
                     <FormItem>
                       <FormLabel>About Yourself</FormLabel>
@@ -250,7 +271,7 @@ const UserInput = () => {
                 }}
               />
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 mini:grid-cols-2 gap-6 mini:gap-3">
               <FormField
                 control={form.control}
                 name="type"
@@ -340,8 +361,12 @@ const UserInput = () => {
               />
             </div>
           </fieldset>
-          <Button type="submit" className="rounded">
-            Generate
+          <Button type="submit" className="rounded" disabled={loadingData}>
+            {loadingData ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              "Generate"
+            )}
           </Button>
         </form>
       </ShadCNForm>
